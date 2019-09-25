@@ -1,0 +1,21 @@
+*{
+  margin:0;
+  padding:0;
+}
+a{
+  text-decoration:none;
+  color:black;
+  transition:none;
+}
+ul{
+  list-style: none;
+}
+body{
+  font-size:.14rem
+}
+html,body{
+  height:100%;
+}
+.toBottom{
+  margin-bottom:50px
+}
