@@ -1,0 +1,58 @@
+{
+  "id": "1181821",
+  "name": "尖叫设计",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "430540",
+      "name": "右箭头",
+      "font_class": "arrow-right",
+      "unicode": "e646",
+      "unicode_decimal": 58950
+    },
+    {
+      "icon_id": "700850",
+      "name": "搜索",
+      "font_class": "sousuo",
+      "unicode": "e652",
+      "unicode_decimal": 58962
+    },
+    {
+      "icon_id": "1799676",
+      "name": "购物车",
+      "font_class": "gouwuche",
+      "unicode": "e65f",
+      "unicode_decimal": 58975
+    },
+    {
+      "icon_id": "4166095",
+      "name": "我",
+      "font_class": "wo",
+      "unicode": "e612",
+      "unicode_decimal": 58898
+    },
+    {
+      "icon_id": "9179632",
+      "name": "首页",
+      "font_class": "shouye",
+      "unicode": "e678",
+      "unicode_decimal": 59000
+    },
+    {
+      "icon_id": "9453185",
+      "name": "分类",
+      "font_class": "fenlei",
+      "unicode": "e606",
+      "unicode_decimal": 58886
+    },
+    {
+      "icon_id": "10156324",
+      "name": "消息",
+      "font_class": "xiaoxi",
+      "unicode": "e633",
+      "unicode_decimal": 58931
+    }
+  ]
+}

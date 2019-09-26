@@ -1,21 +1,26 @@
 import React from 'react';
-import axios from 'axios'
 import './App.css';
 import Tabber from './components/tabbar'
+import store from './Rudex'
+
 class App extends React.Component{
+  state = {
+    isShow:true
+  }
+  componentDidMount () {
+    store.subscribe(()=>{
+      this.setState({
+        isShow:store.getState().isShow
+      })
+    })
+  }
   render(){
     return <div className="toBottom">
-      App
         {this.props.children}
-        <Tabber></Tabber>
+        {
+          this.state.isShow?<Tabber></Tabber>:null
+        }
     </div>
-  }
-  componentDidMount(){
-    axios({
-      url:'/v2/page?pageId=1&tabId=1&currentPage=1&pageSize=8&_=1569414452380'
-    }).then(res=>{
-      console.log(res.data)
-    })
   }
 }
 
