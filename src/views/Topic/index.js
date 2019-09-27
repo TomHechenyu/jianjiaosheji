@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import store from '../../Rudex'
 import isShow from './actionCreator'
 import TopicHeader from './TopicHeader'
@@ -6,8 +6,11 @@ import axios from 'axios'
 import style from './index.module.scss'
 import Swiper from 'swiper'
 import 'swiper/css/swiper.css'
+import { Modal,Toast,ActivityIndicator } from 'antd-mobile';
 
-class Topic extends Component {
+const prompt = Modal.prompt;
+
+class Topic extends PureComponent {
     state = {
         currentPage:2,
         sort:'onShelfTime',
@@ -17,11 +20,14 @@ class Topic extends Component {
 		item:this.urlId(),
 		isShow:false,
 		desc:false,
+		success:true,
         data: [],
+		loadName:'没有更多了',
 		lineHead:['上新','销量','价格'],
 		filmData:[{id:35,soft:'All'},{id:20,soft:'沙发'},{id:21,soft:'椅凳'},{id:2310,soft:'床'},{id:24,soft:'柜架'},{id:2210,soft:'餐桌'},{id:2211,soft:'茶几和边桌'},{id:2212,soft:'书桌'}],
     }
 	add;
+	top;
     render() {
         return (
             <div>
@@ -48,14 +54,45 @@ class Topic extends Component {
 							className={(this.state.linePage===index?style.line_page:'')} 
 							onClick={this.linePageClick.bind(this,index)}>
 								{res}{index===2?(this.state.desc?'↑':'↓'):null}
-							</span>,
+							</span>
 						</li>
 					)}
 				</ul>
+				<ActivityIndicator
+					text="Loading..."
+					size="large"
+					animating={this.state.success}
+					className={style.success}
+				  />
                 <ul className={style.list} ref="ulLastChild">
                     {
                         this.state.data.map((item,index)=>
-						<li key={index}>
+						<li key={index} 
+						onClick={() => prompt('数量', '请选择添加的个数', [
+						  { text: '取消' },
+						  { text: '添加', 
+						  onPress: (value) => {
+							  if(!parseFloat(value) || parseFloat(value) > 99 || parseFloat(value) <= 0){
+								  Toast.info('数量错误，添加失败', 1.5);
+								  return;
+							  }
+							  axios({
+								  url:'/users',
+								  method:'post',
+								  data:{
+									  name:item.productTitle,
+									  img:item.productImg,
+									  count:parseFloat(value),
+									  price:parseFloat(item.sellPrice)
+								  }
+							  }).then(res=>{
+								  if(res.data.ok){
+									  Toast.info('添加购物车成功', 1.5);
+								  }
+							  })
+						  }},
+						], 'default', '1')}
+						>
 							<img src={item.productImg} alt=""/>
 							<div className={style.prodect}>
 								<p className={style.prodect_title}>{item.productTitle}</p>
@@ -69,22 +106,27 @@ class Topic extends Component {
 						</li>)
                     }
                 </ul>
+				<div className={style.loadName}>{this.state.loadName}</div>
+				{
+					this.state.isShow?<div className={style.topic_top} onClick={this.toTop}>顶部</div>:null
+				}
             </div>
         );
     }
 	componentDidMount () {
 		var start = Date.now()
-		axios({
-			url:'/users'
-		}).then(res=>{
-			console.log(res.data)
-		})
+		// axios({
+		// 	url:'/users'
+		// }).then(res=>{
+		// 	console.log(res.data)
+		// })
 	    setTimeout(()=>{
 	        store.dispatch(isShow(false))
 	    },0)
 	    this.http(this.urlId()).then(data=>{
 	        this.setState({
-	            data: data.data
+	            data: data.data,
+				success:false
 	        })
 	    })
 	    new Swiper('.swiper-container', {
@@ -94,6 +136,9 @@ class Topic extends Component {
 	    });
 		window.addEventListener('scroll',this.add=()=>{
 			var now = Date.now()
+			this.setState({
+				loadName:'加载数据中...'
+			})
 			if (now - start <= 300) {
 				return;
 			}
@@ -102,15 +147,20 @@ class Topic extends Component {
 				this.http(this.state.item,this.state.currentPage).then(res=>{
 					if(res.data.length===0){
 						window.removeEventListener('scroll',this.add)
+						this.setState({
+							loadName:'没有更多了'
+						})
 						return;
 					}
 					this.setState({
 						currentPage:this.state.currentPage+1,
-						data:[...this.state.data,...res.data]
+						data:[...this.state.data,...res.data],
 					})
 				})
 			}
-			if((document.documentElement.scrollTop || document.body.scrollTop) >= 400){
+		})
+		window.addEventListener('scroll',this.top=()=>{
+			if((document.documentElement.scrollTop || document.body.scrollTop) >= 800){
 				this.setState({
 					isShow:true
 				})
@@ -123,48 +173,33 @@ class Topic extends Component {
 	}
     componentWillUnmount () {
 		window.removeEventListener('scroll',this.add)
+		window.removeEventListener('scroll',this.top)
         setTimeout(()=>{
             store.dispatch(isShow(true))
         },0)
     }
+	lineHeadSort = (sort,order,index,desc=false) => {
+		this.setState({
+			sort:sort,
+			order:order,
+			desc:desc,
+			currentPage:2
+		},()=>{
+			this.lineHttp.call(this,index)
+		})
+	}
 	linePageClick (index) {
+		window.removeEventListener('scroll',this.add)
+		window.addEventListener('scroll',this.add)
 		if(index===0){
-			this.setState({
-				sort:"onShelfTime",
-				order:'desc',
-				desc:false,
-				currentPage:2
-			},()=>{
-				this.lineHttp.call(this,index)
-			})
+			this.lineHeadSort("onShelfTime","desc",index)
 		}else if(index===1){
-			this.setState({
-				sort:"sales",
-				order:'desc',
-				desc:false,
-				currentPage:2
-			},()=>{
-				this.lineHttp.call(this,index)
-			})
+			this.lineHeadSort("sales","desc",index)
 		}else{
 			if(this.state.desc){
-				this.setState({
-					sort:"price",
-					order:'desc',
-					desc:false,
-					currentPage:2
-				},()=>{
-					this.lineHttp.call(this,index)
-				})
+				this.lineHeadSort("price","desc",index)
 			}else{
-				this.setState({
-					sort:"price",
-					order:'asc',
-					desc:true,
-					currentPage:2
-				},()=>{
-					this.lineHttp.call(this,index)
-				})
+				this.lineHeadSort("price","asc",index,true)
 			}
 			
 		}
@@ -179,15 +214,17 @@ class Topic extends Component {
 		})
 	}
 	updateList (item,index) {
+		window.removeEventListener('scroll',this.add)
+		window.addEventListener('scroll',this.add)
 		this.setState({
 			item:item.id,
-			linePage:0,
-			currentPage:2
+			linePage:0
 		})
 		this.http(item.id).then(res=>{
 			this.setState({
 				data:res.data,
-				current:index
+				current:index,
+				currentPage:2
 			})
 		})
 	}
@@ -198,6 +235,14 @@ class Topic extends Component {
             return res.data
         })
     }
+	toTop () {
+		document.documentElement.scrollTop = 0
+	}
+	pushToCart (item) {
+		console.log(item.productTitle)
+		console.log(item.productImg)
+		console.log(item.sellPrice)
+	}
     urlId () {
         return decodeURIComponent(this.props.location.search.split('?')[1].split('&')[0].split('=')[1])
     }
