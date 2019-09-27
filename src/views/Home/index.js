@@ -3,6 +3,7 @@ import {Route,Switch,Redirect} from 'react-router-dom'
 import Recommend from './Recommend'
 import Quality from './Quality'
 import LivingAtHome from './LivingAtHome'
+import axios from 'axios'
 
 class Home extends Component {
     render() {

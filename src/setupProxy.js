@@ -9,4 +9,8 @@ module.exports = function(app){
         target:"https://m.wowdsgn.com",
         changeOrigin:true
     }));
+	app.use(proxy('/users', {
+        target:"http://47.104.226.76:80",
+        changeOrigin:true
+    }));
 }
