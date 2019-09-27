@@ -4,8 +4,8 @@ import Header from './Header'
 
 class Classify extends Component {
     state = {
-        filmData:['沙发','椅凳','床','柜架','餐桌','茶几和边桌','书桌'],
-        goods:['灯具','用餐','时尚生活','收纳','烹饪','纺织品','家饰','卫浴']
+        filmData:[{id:20,soft:'沙发'},{id:21,soft:'椅凳'},{id:2310,soft:'床'},{id:24,soft:'柜架'},{id:2210,soft:'餐桌'},{id:2211,soft:'茶几和边桌'},{id:2212,soft:'书桌'}],
+        goods:[{id:25,soft:'灯具'},{id:26,soft:'用餐'},{id:32,soft:'时尚生活'},{id:33,soft:'收纳'},{id:27,soft:'烹饪'},{id:28,soft:'纺织品'},{id:29,soft:'家饰'},{id:31,soft:'卫浴'}]
     }
     render() {
         return (

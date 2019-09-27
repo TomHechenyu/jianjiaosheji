@@ -9,11 +9,11 @@ class ClassifyItem extends React.Component {
     }
     render () {
         return <div className={style.item}>
-            <img src={this.state.img} alt="" onClick={this.toDetail.bind(this)}/>
+            <img src={this.state.img} alt=""/>
             <ul>
                 {
                     this.state.filmData.map(data=>
-                        <ClassifyLi key={data} {...this.props}>{data}</ClassifyLi>
+                        <ClassifyLi key={data.id} {...this.props} only={data.id} name={data.soft}>{data.soft}</ClassifyLi>
                     )
                 }
             </ul>
@@ -24,9 +24,6 @@ class ClassifyItem extends React.Component {
             filmData:newProps.filmData,
             img:newProps.img
         }
-    }
-    toDetail () {
-        this.props.history.push(`/topic/111`)
     }
 }
 

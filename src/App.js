@@ -15,7 +15,7 @@ class App extends React.Component{
     })
   }
   render(){
-    return <div className="toBottom">
+    return <div>
         {this.props.children}
         {
           this.state.isShow?<Tabber></Tabber>:null
