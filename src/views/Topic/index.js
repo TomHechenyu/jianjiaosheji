@@ -12,23 +12,24 @@ const prompt = Modal.prompt;
 
 class Topic extends PureComponent {
     state = {
-        currentPage:2,
-        sort:'onShelfTime',
-        order:'desc',
-		current:0.,
-		linePage:0,
-		item:this.urlId(),
-		isShow:false,
-		desc:false,
-		success:true,
-        data: [],
-		loadName:'没有更多了',
-		lineHead:['上新','销量','价格'],
-		filmData:[{id:35,soft:'All'},{id:20,soft:'沙发'},{id:21,soft:'椅凳'},{id:2310,soft:'床'},{id:24,soft:'柜架'},{id:2210,soft:'餐桌'},{id:2211,soft:'茶几和边桌'},{id:2212,soft:'书桌'}],
+        currentPage:2, // 数据请求 页数
+        sort:'onShelfTime', //数据请求
+        order:'desc', //数据请求
+		current:0., //高亮
+		linePage:0, //数据排序的高亮
+		item:this.urlId(), //每次点击的id
+		isShow:false, //回到顶部显示和隐藏
+		desc:false, //价格的上下排序
+		success:true, //loading...
+        data: [], // 动态请求的数据
+		loadName:'没有更多了', //最下方 提示
+		lineHead:['上新','销量','价格'], //数据的排序
+		filmData:[{id:35,soft:'All'},{id:20,soft:'沙发'},{id:21,soft:'椅凳'},{id:2310,soft:'床'},{id:24,soft:'柜架'},{id:2210,soft:'餐桌'},{id:2211,soft:'茶几和边桌'},{id:2212,soft:'书桌'}], //swiper
     }
-	add;
-	top;
+	add; //懒加载的事件
+	top; //回到顶部的事件
     render() {
+		let { filmData, current, lineHead, linePage, desc, success, data, loadName, isShow } = this.state
         return (
             <div>
                 <TopicHeader {...this.props}></TopicHeader>
@@ -36,9 +37,9 @@ class Topic extends PureComponent {
                     <div className={"swiper-container "+style.slider}>
                         <ul className="swiper-wrapper">
 							{
-								this.state.filmData.map(((item,index)=>
+								filmData.map(((item,index)=>
 									<li
-									className={"swiper-slide "+style.slide+(this.state.current===index?' '+style.header_active:'')} 
+									className={"swiper-slide "+style.slide+(current===index?' '+style.header_active:'')} 
 									key={item.id} 
 									onClick={this.updateList.bind(this,item,index)}>
 										{item.soft}
@@ -49,11 +50,11 @@ class Topic extends PureComponent {
                     </div>
                 </div>
 				<ul className={style.head_line}>
-					{this.state.lineHead.map((res,index)=><li key={index}>
+					{lineHead.map((res,index)=><li key={index}>
 							<span 
-							className={(this.state.linePage===index?style.line_page:'')} 
+							className={(linePage===index?style.line_page:'')} 
 							onClick={this.linePageClick.bind(this,index)}>
-								{res}{index===2?(this.state.desc?'↑':'↓'):null}
+								{res}{index===2?(desc?'↑':'↓'):null}
 							</span>
 						</li>
 					)}
@@ -61,18 +62,18 @@ class Topic extends PureComponent {
 				<ActivityIndicator
 					text="Loading..."
 					size="large"
-					animating={this.state.success}
+					animating={success}
 					className={style.success}
 				  />
                 <ul className={style.list} ref="ulLastChild">
                     {
-                        this.state.data.map((item,index)=>
+                        data.map((item,index)=>
 						<li key={index} 
 						onClick={() => prompt('数量', '请选择添加的个数', [
 						  { text: '取消' },
 						  { text: '添加', 
 						  onPress: (value) => {
-							  if(!parseFloat(value) || parseFloat(value) > 99 || parseFloat(value) <= 0){
+							  if(!parseFloat(value) || parseInt(value) > 99 || parseInt(value) <= 0 ){
 								  Toast.info('数量错误，添加失败', 1.5);
 								  return;
 							  }
@@ -82,7 +83,7 @@ class Topic extends PureComponent {
 								  data:{
 									  name:item.productTitle,
 									  img:item.productImg,
-									  count:parseFloat(value),
+									  count:parseInt(value),
 									  price:parseFloat(item.sellPrice)
 								  }
 							  }).then(res=>{
@@ -106,9 +107,9 @@ class Topic extends PureComponent {
 						</li>)
                     }
                 </ul>
-				<div className={style.loadName}>{this.state.loadName}</div>
+				<div className={style.loadName}>{loadName}</div>
 				{
-					this.state.isShow?<div className={style.topic_top} onClick={this.toTop}>顶部</div>:null
+					isShow?<div className={style.topic_top} onClick={this.toTop}>顶部</div>:null
 				}
             </div>
         );
